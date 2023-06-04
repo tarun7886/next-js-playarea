@@ -13,10 +13,8 @@ const DrawPanda = () => {
 
   const handleSubmit = async (values) => {
     if (values.action_type === 'create') {
-      console.log("here");
       socketRef.current.emit("create-room", values)
       socketRef.current.on("room-created", (data) => {
-        console.log(data);
         setRoomId(data.roomId)
         setUser(data.user)
         setAdmin(data.admin)
@@ -24,7 +22,6 @@ const DrawPanda = () => {
     } else {
       socketRef.current.emit("join-room", values)
       socketRef.current.on("joined-room", (data) => {
-        console.log(data);
         setRoomId(data.roomId)
         setAdmin(data.admin)
         setUser(data.user)

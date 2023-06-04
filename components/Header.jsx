@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 let call = 0
 const Header = (props) => {
@@ -20,6 +21,7 @@ const Header = (props) => {
       <div className="navbar-login">
         <a className="navbar-login-btn" href="/login">Login</a>
       </div>
+      <Link href="/draw-panda">Draw Panda</Link>
       <div className="navbar-touch">
         <button className="navbar-touch-btn">Get in touch</button>
       </div>

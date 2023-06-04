@@ -14,7 +14,6 @@ export default function Home() {
         <FixedTopBottom/>
       </div>
       <div className="footer" >
-
       </div>
     </div>
   )

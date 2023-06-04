@@ -1,36 +1,58 @@
-import { Input, Form, Button } from 'antd'
-import React, { useEffect, useState } from 'react'
+import { Input, Form, Button, Row, Col } from 'antd'
+import React, { useEffect, useRef, useState } from 'react'
+import ReactDOM from 'react-dom';
 
 const Messages = ({socketRef, roomId, user}) => {
   const [messages, setMessages] = useState([])
+  const [form] = Form.useForm()
+  const messageRef = useRef(null)
+  const inputRef = useRef(null)
+  const updateMessage = (value) => {
+    const copy = JSON.parse(JSON.stringify(messages))
+    copy.push(value)
+    setMessages(copy)
+  }
   useEffect(() => {
     if (socketRef.current) {
-      socketRef.current.on("receive-message", (value) => {
-        const copy = JSON.parse(JSON.stringify(messages))
-        copy.push(value)
-        setMessages(copy)
-      })
+      socketRef.current.on("new-message", updateMessage)
     }
   }, [messages, socketRef.current])
+  useEffect(() => {
+    if (messages.length) {
+      const messagesContainer = ReactDOM.findDOMNode(messageRef.current);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  }, [messages]);
 
   const sendMessage = (values) => {
-    console.log(values);
+    updateMessage({...values, roomId, user})
     socketRef.current.emit("send-message", {...values, roomId, user})
+    form.resetFields()
+    inputRef.current.focus()
   }
   return (
     <div className='message-container' id="message-container">
-      {
-        messages.map((el, key) => {
-          return <div key={key}>{el.message}</div>
-        })
-      }
+      <div className='message-scroller' ref={messageRef}>
+        {
+          messages.map((el, key) => {
+            return <Row className='message-row' gutter={12}>
+              <Col span={6}>
+                <strong>{el.user}: </strong>
+              </Col>
+              <Col span={18}>
+                <div className='message-body' key={key}>{el.message}</div>
+              </Col>
+            </Row>
+          })
+        }
+      </div>
       <Form
         onFinish={sendMessage}
+        form={form}
       >
         <Form.Item label="Input" name="message" rules={[{required: true, whitespace: false}]}>
-          <Input/>
+          <Input ref={inputRef} />
         </Form.Item>
-        {/* <Button htmlType="submit">Submit</Button> */}
       </Form>
     </div>
   )

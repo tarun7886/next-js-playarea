@@ -56,12 +56,15 @@ const SocketHandler = (req, res) => {
 					socket.emit("error_message", res)
 				} else {
 					socket.emit("joined-room", res)
-					socket.broadcast.to(res.roomId).emit("user-joined", res)
+					// socket.broadcast.to(res.roomId).emit("new-message", {
+					// 	message: `${res.user} joined the room`,
+					// 	type: "new_user"
+					// })
 					socket.join(res.roomId)
 				}
 			})
 			socket.on("send-message", data => {
-				socket.broadcast.to(data.roomId).emit("receive-message", data)
+				socket.broadcast.to(data.roomId).emit("new-message", data)
 			})
 
 			socket.on("join-room1", ({ room, name }, callback) => {

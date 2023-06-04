@@ -140,4 +140,16 @@
     // height: 80vh;
     border: 1px solid black;
   }
+  .message-scroller {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .message-row {
+    margin-bottom: 5px;
+  }
+  .message-body {
+    max-width: 100%;
+    word-wrap: normal;
+  }
 }
