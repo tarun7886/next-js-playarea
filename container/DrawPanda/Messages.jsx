@@ -35,7 +35,7 @@ const Messages = ({socketRef, roomId, user}) => {
       <div className='message-scroller' ref={messageRef}>
         {
           messages.map((el, key) => {
-            return <Row className='message-row' gutter={12}>
+            return <Row key={key} className='message-row' gutter={12}>
               <Col span={6}>
                 <strong>{el.user}: </strong>
               </Col>
@@ -50,7 +50,7 @@ const Messages = ({socketRef, roomId, user}) => {
         onFinish={sendMessage}
         form={form}
       >
-        <Form.Item label="Input" name="message" rules={[{required: true, whitespace: false}]}>
+        <Form.Item name="message" rules={[{required: true, whitespace: false}]}>
           <Input ref={inputRef} />
         </Form.Item>
       </Form>

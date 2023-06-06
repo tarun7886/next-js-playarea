@@ -103,6 +103,11 @@ const SocketHandler = (req, res) => {
 				socket.to(room).emit("game-started")
 			})
 
+			socket.on("drawingData", ({roomId, data}) => {
+				console.log(roomId, data);
+				socket.to(roomId).emit("drawingData", data)
+			})
+
 			// const offset = socket.handshake.auth.offset
 			// console.log(offset)
 			// socket.onAny((event, ...args) => {
