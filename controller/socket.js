@@ -1,5 +1,5 @@
 import { rooms } from "../data/room"
-import { generateRandomString } from "../services/utils"
+import { generateRoomId } from "../services/utils"
 
 export const joinRoom = (data) => {
 	let roomId = data.roomId
@@ -16,9 +16,9 @@ export const joinRoom = (data) => {
 }
 
 export const createRoom = (data) => {
-	let roomId = generateRandomString(6)
+	let roomId = generateRoomId(6)
 	while (rooms.find((el) => el.roomId === roomId)) {
-		roomId = generateRandomString(6)
+		roomId = generateRoomId(6)
 	}
 	let admin = data.user
 	rooms.push({ roomId, admin, users: [admin] })

@@ -146,12 +146,19 @@
   .draw-panda-board {
     width: 100%;
     height: calc(100vh - 200px);
-  }
-  canvas {
-    margin: auto;
-    // width: 80%;
-    // height: 80vh;
-    border: 1px solid black;
+    position: relative;
+    .clear_canvas {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+    }
+    canvas {
+      margin: auto;
+      display: block;
+      // width: 80%;
+      // height: 80vh;
+      box-shadow: 0 0 5px #ddd;
+    }
   }
   .message-container {
     position: absolute;

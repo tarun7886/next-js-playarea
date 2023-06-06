@@ -107,6 +107,10 @@ const SocketHandler = (req, res) => {
 				console.log(roomId, data);
 				socket.to(roomId).emit("drawingData", data)
 			})
+			socket.on("clearCanvas", ({roomId}) => {
+				// socket.broadcast.to(roomId).emit("clearCanvas")
+				socket.to(roomId).emit("clearCanvas")
+			})
 
 			// const offset = socket.handshake.auth.offset
 			// console.log(offset)
