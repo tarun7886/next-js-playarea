@@ -1,6 +1,7 @@
-import { Button } from "antd"
+import { Button, Space } from "antd"
 import React, { useRef, useEffect, useState } from "react";
 import { isMobileBrowser } from "../../services/utils";
+import DownloadCanvas from "./DownloadCanvas";
 
 const Board = ({roomId, drawing, socketRef}) => {
     const canvasRef = useRef(null);
@@ -134,10 +135,15 @@ const Board = ({roomId, drawing, socketRef}) => {
 
     return <div id="panda_board" className="draw-panda-board">
         <canvas id="my_canvas" ref={canvasRef} width={dimensions.width} height={dimensions.height} />
-        <Button className="clear_canvas" onClick={() => {
-          socketRef.current.emit("clearCanvas", {roomId})
-          clearCanvas()
-        }}>Clear Canvas</Button>
+        <Space className="canvas_actions" >
+          <Button onClick={() => {
+            socketRef.current.emit("clearCanvas", {roomId})
+            clearCanvas()
+          }}>Clear Canvas</Button>
+          <DownloadCanvas
+            canvas={canvasRef.current}
+          />
+        </Space>
     </div>
 }
 
