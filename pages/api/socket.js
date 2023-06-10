@@ -104,7 +104,6 @@ const SocketHandler = (req, res) => {
 			})
 
 			socket.on("drawingData", ({roomId, data}) => {
-				console.log(roomId, data);
 				socket.to(roomId).emit("drawingData", data)
 			})
 			socket.on("clearCanvas", ({roomId}) => {

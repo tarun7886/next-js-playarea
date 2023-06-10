@@ -3,6 +3,23 @@ import React, { useRef, useEffect, useState } from "react";
 import { isMobileBrowser } from "../../services/utils";
 import DownloadCanvas from "./DownloadCanvas";
 
+const debouceSendData = (fxn, delay, limit) => {
+  let data = []
+  let timer = null
+  return (...args) => {
+    clearTimeout(timer)
+    data.push(args)
+    if (limit && data.length > limit) {
+      fxn.call(this, data)
+      data = []
+    }
+    timer = setTimeout(() => {
+      fxn.call(this, data)
+      data = []
+    }, delay);
+  }
+}
+
 const Board = ({roomId, drawing, socketRef}) => {
     const canvasRef = useRef(null);
     const [isMobile, setIsMobile] = useState(true)
@@ -11,21 +28,24 @@ const Board = ({roomId, drawing, socketRef}) => {
       width: 100
     })
     useEffect(() => {
-      function dim(){
+      function calculateDim(){
         let el = document.getElementById("panda_board")
         const width = el.clientWidth
         const height = el.clientHeight
-        let temp = {width: Math.min(width, height), height: Math.min(width, height)}
-        if (dimensions.height !== temp.height || dimensions.width !== temp.width) {
-          canvasRef.current.style.height = `${temp.height}px`
-          canvasRef.current.style.width = `${temp.width}px`
-          setDimensions(temp)
-        }
+        // let temp = {width: Math.min(width, height), height: Math.min(width, height)}
+        // if (dimensions.height !== temp.height || dimensions.width !== temp.width) {
+        //   canvasRef.current.style.height = `${temp.height}px`
+        //   canvasRef.current.style.width = `${temp.width}px`
+        //   setDimensions(temp)
+        // }
+        canvasRef.current.style.height = `${height}px`
+        canvasRef.current.style.width = `${width}px`
+        setDimensions({height, width})
       }
       setIsMobile(isMobileBrowser())
-      dim()
-      window.addEventListener("resize", dim)
-      return () => window.removeEventListener("resize", dim)
+      calculateDim()
+      window.addEventListener("resize", calculateDim)
+      return () => window.removeEventListener("resize", calculateDim)
     }, [])
 
     let isDrawing =false;
@@ -36,7 +56,6 @@ const Board = ({roomId, drawing, socketRef}) => {
       if (e instanceof PointerEvent) {
         return {x: e.offsetX, y: e.offsetY}
       } else if (e instanceof TouchEvent) {
-        debugger
         const touch = e.touches[0];
         let offsetLeft = document.getElementById("panda_board").offsetLeft + canvasRef.current.offsetLeft 
         let offsetTop = document.getElementById("panda_board").offsetTop + canvasRef.current.offsetTop 
@@ -50,6 +69,21 @@ const Board = ({roomId, drawing, socketRef}) => {
       ctx.clearRect(0, 0, dimensions.width, dimensions.height);
     }
 
+    const figureOutOffset = (orgHeight, orgWidth) => {
+      const {width, height} = dimensions
+      let offsetWidth = 0
+      let offsetHeight = 0
+      if (orgWidth / orgHeight < width / height) {
+        offsetWidth = (width - (orgWidth / orgHeight * height)) / 2
+      } else {
+        offsetHeight = (height - (orgHeight / orgWidth * width)) / 2
+      }
+      return {
+        offX: offsetWidth,
+        offY: offsetHeight,
+      }
+    }
+
     useEffect(() => {
       if (!socketRef.current) {
         return () => {}
@@ -58,28 +92,27 @@ const Board = ({roomId, drawing, socketRef}) => {
       const ctx = canvas.getContext('2d');
       const {height, width} = dimensions
 
-      function drawLine(context, x1, y1, x2, y2) {
+      function drawLine(context, x1, y1, x2, y2, orgHeight, orgWidth) {
         context.strokeStyle = 'black';
         context.lineWidth = 5;
         context.beginPath();
-        context.moveTo(x1 * width , y1 * height);
-        context.lineTo(x2 * width, y2 * height);
+        const {offX, offY} = figureOutOffset(orgHeight, orgWidth)
+        context.moveTo( offX + (x1 * (width - 2 * offX)) , offY + (y1 * (height - 2 * offY)));
+        context.lineTo(offX + (x2  * (width - 2 * offX)), offY + (y2 * (height - 2 * offY)));
+
         context.stroke();
       }
 
       function handleDrawingData(data) {
-        const { startX, startY, endX, endY } = data;
-        console.log(data);
-        drawLine(ctx, startX, startY, endX, endY);
+        data.map(el => {
+          const { lastX, lastY, endX, endY, height: orgHeight, width: orgWidth } = el[0];
+          drawLine(ctx, lastX, lastY, endX, endY, orgHeight, orgWidth);
+        })
       }
-      function sendDrawingData(startX, startY, endX, endY) {
-        socketRef.current.emit('drawingData', {roomId, data: {
-          startX,
-          startY,
-          endX,
-          endY,
-        }});
+      function sendDrawingData(data) {
+        socketRef.current.emit('drawingData', {roomId, data});
       }
+      const debouceSend = debouceSendData(sendDrawingData, 1000, 100)
 
       function handleStart(e) {
         isDrawing = true
@@ -91,8 +124,8 @@ const Board = ({roomId, drawing, socketRef}) => {
         const x = getPointOnCanvas(e).x
         const y = getPointOnCanvas(e).y
 
-        drawLine(ctx, lastX / width, lastY / height, x / width, y / height);
-        sendDrawingData(lastX / width, lastY / height, x / width, y/ height);
+        drawLine(ctx, lastX / width, lastY / height, x / width, y / height, height, width);
+        debouceSend({lastX: lastX / width, lastY: lastY / height, endX: x / width, endY:y/ height, height, width});
         lastX = x
         lastY = y
       }
