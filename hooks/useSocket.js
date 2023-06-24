@@ -1,15 +1,17 @@
 import { message } from "antd"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { io } from "socket.io-client";
 
 let currentIO = null
 
 const useSocket = () => {
+  const [mainRef, setRef] = useState({current: null})
   const socketRef = useRef(null);
   useEffect(() => socketInitializer(), [])
   const socketInitializer = async () => {
     if (currentIO) {
       socketRef.current = currentIO
+      setRef(socketRef)
     } else {
       await fetch('/api/socket');
       currentIO = io()
@@ -24,6 +26,7 @@ const useSocket = () => {
       socketRef.current.on("error_message", value => {
         message.error(value.message)
       })
+      setRef(socketRef)
     }
     // socketRef.current.on("message", (mes)=> {
     //   console.log(mes)
@@ -33,7 +36,7 @@ const useSocket = () => {
     //   setInput(msg)
     // })
   }
-  return [socketRef]
+  return [mainRef]
 }
 
 export default useSocket

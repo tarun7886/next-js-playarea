@@ -6,9 +6,9 @@ import useSocket from "../../hooks/useSocket"
 import DrawPandaContainer from '../../container/DrawPanda'
 
 const DrawPanda = () => {
-  const [roomId, setRoomId] = useState(undefined)
-  const [user, setUser] = useState(undefined)
-  const [admin, setAdmin] = useState(undefined)
+  const [roomId, setRoomId] = useState("home")
+  const [user, setUser] = useState("home")
+  const [admin, setAdmin] = useState("done")
   const [socketRef] = useSocket()
 
   const handleSubmit = async (values) => {

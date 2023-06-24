@@ -147,6 +147,7 @@
     width: 100%;
     height: calc(100vh - 200px);
     position: relative;
+    touch-action: none;
     .canvas_actions {
       position: absolute;
       bottom: 5px;
@@ -172,6 +173,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     opacity: 0.4;
+    pointer-events: none;
   }
   .message-row {
     margin-bottom: 5px;

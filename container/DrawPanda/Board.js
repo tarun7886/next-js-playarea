@@ -27,6 +27,14 @@ const Board = ({roomId, drawing, socketRef}) => {
       height: 100,
       width: 100
     })
+
+    useEffect(() => {
+      let board = document.getElementById("panda_board")
+      board.addEventListener("scroll", (e) => {
+        e.stopPropagation()
+      })
+    }, [])
+
     useEffect(() => {
       function calculateDim(){
         let el = document.getElementById("panda_board")
@@ -53,12 +61,13 @@ const Board = ({roomId, drawing, socketRef}) => {
     let lastY =0;
 
     const getPointOnCanvas = (e) => {
-      if (e instanceof PointerEvent) {
+      if (e instanceof PointerEvent || e instanceof MouseEvent) {
         return {x: e.offsetX, y: e.offsetY}
       } else if (e instanceof TouchEvent) {
         const touch = e.touches[0];
-        let offsetLeft = document.getElementById("panda_board").offsetLeft + canvasRef.current.offsetLeft 
-        let offsetTop = document.getElementById("panda_board").offsetTop + canvasRef.current.offsetTop 
+        const canvasRect = canvasRef.current.getBoundingClientRect()
+        let offsetLeft = canvasRect.left + window.scrollX
+        let offsetTop = canvasRect.top + window.scrollY
         return {x: touch.clientX - offsetLeft, y: touch.clientY - offsetTop}
       }
     }
@@ -97,7 +106,7 @@ const Board = ({roomId, drawing, socketRef}) => {
         context.lineWidth = 5;
         context.beginPath();
         const {offX, offY} = figureOutOffset(orgHeight, orgWidth)
-        context.moveTo( offX + (x1 * (width - 2 * offX)) , offY + (y1 * (height - 2 * offY)));
+        context.moveTo(offX + (x1 * (width - 2 * offX)) , offY + (y1 * (height - 2 * offY)));
         context.lineTo(offX + (x2  * (width - 2 * offX)), offY + (y2 * (height - 2 * offY)));
 
         context.stroke();
@@ -112,6 +121,7 @@ const Board = ({roomId, drawing, socketRef}) => {
       function sendDrawingData(data) {
         socketRef.current.emit('drawingData', {roomId, data});
       }
+
       const debouceSend = debouceSendData(sendDrawingData, 1000, 100)
 
       function handleStart(e) {
@@ -132,13 +142,14 @@ const Board = ({roomId, drawing, socketRef}) => {
       function handleEnd(e){
         isDrawing = false
       }
+      console.log({isMobile})
       if (!isMobile) {
-        canvas.addEventListener("pointerdown" , handleStart, false);
-        canvas.addEventListener('pointermove', handleMove, false);
-        canvas.addEventListener('pointerup', handleEnd, false);
-        canvas.addEventListener("pointerout", handleEnd, false);
-        canvas.addEventListener("pointerleave", handleEnd, false);
-        canvas.addEventListener("pointercancel", handleEnd, false);
+        canvas.addEventListener("mousedown" , handleStart, false);
+        canvas.addEventListener('mousemove', handleMove, false);
+        canvas.addEventListener('mouseup', handleEnd, false);
+        canvas.addEventListener("mouseout", handleEnd, false);
+        canvas.addEventListener("mouseleave", handleEnd, false);
+        canvas.addEventListener("mousecancel", handleEnd, false);
       } else {
         canvas.addEventListener('touchstart', handleStart, false);
         canvas.addEventListener('touchmove', handleMove, false);
