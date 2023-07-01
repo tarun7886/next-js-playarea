@@ -19,7 +19,7 @@ const HideShowImage = (props) => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [position])
   return <div className='hide-show-container'>
-      <h1>You shouldn’t be the only oneeating healthy.</h1>
+      <h1>You shouldn’t be the only one eating healthy.</h1>
       <p>Like you, we love our pets and care about their health. That’s why we created The Farmer’s Dog — a service that delivers balanced, freshly made pet food with simple recipes, guided by science, and driven by love</p>
       <div className='image-container' id="imageContainer" >
         <div className='image-block-1'>

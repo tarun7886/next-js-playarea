@@ -4,7 +4,7 @@ import {Button} from 'antd'
 const DownloadCanvas = (props) => {
     const downloadCanvas = () => {
         const {canvas} = props
-        const href = canvas.toDataURL('image/png')
+        const href = canvas.toDataURL('image/jpeg')
         var link = document.createElement('a')
         link.href = href
         link.download = "draw-panda"

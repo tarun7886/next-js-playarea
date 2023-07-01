@@ -50,7 +50,7 @@ const Board = ({roomId, drawing, socketRef}) => {
         canvasRef.current.style.width = `${width}px`
         setDimensions({height, width})
       }
-      setIsMobile(isMobileBrowser())
+      setIsMobile(isMobileBrowser() && false)
       calculateDim()
       window.addEventListener("resize", calculateDim)
       return () => window.removeEventListener("resize", calculateDim)
@@ -162,9 +162,12 @@ const Board = ({roomId, drawing, socketRef}) => {
 
       return () => {
         if (!isMobile) {
-          canvas.removeEventListener('pointerdown', handleStart);
-          canvas.removeEventListener('pointermove', handleMove);
-          canvas.removeEventListener('pointerup', handleEnd);
+          canvas.removeEventListener('mousedown', handleStart);
+          canvas.removeEventListener('mousemove', handleMove);
+          canvas.removeEventListener('mouseup', handleEnd);
+          canvas.removeEventListener('mouseout', handleEnd);
+          canvas.removeEventListener('mouseleave', handleEnd);
+          canvas.removeEventListener('mousecancel', handleEnd);
         } else {
           canvas.removeEventListener('touchstart', handleStart);
           canvas.removeEventListener('touchmove', handleMove);
