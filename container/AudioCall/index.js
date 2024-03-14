@@ -3,13 +3,13 @@ import useSocket from '../../hooks/useSocket'
 import { Button } from 'antd'
 import {SoundOutlined, AudioOutlined, AudioMutedOutlined} from '@ant-design/icons'
 
-const Audio = (props) => {
+const AudioCall = (props) => {
     const [speaking, setSpeaking]= useState(false)
     const [socketRef] = useSocket()
-    const [localRef] = useRef(null) 
-    const [remoteRef] = useRef(null) 
-    const [yourConn] = useRef(null)
-    const [stream] = useRef(null)
+    const localRef = useRef(null) 
+    const remoteRef = useRef(null) 
+    const yourConn = useRef(null)
+    const stream = useRef(null)
     
     const handleLocalInput = (e) => {
         setSpeaking(!speaking)
@@ -24,7 +24,7 @@ const Audio = (props) => {
         stream.current = myStream; 
            
         //displaying local audio stream on the page 
-        localAudio.src = window.URL.createObjectURL(stream.current);
+        localAudio.src = stream.current;
            
         //using Google public stun server 
         var configuration = { 
@@ -70,18 +70,18 @@ const Audio = (props) => {
     return <div className='audio_call_wrapper'>
         <Button icon={<SoundOutlined />} >
         <audio ref={remoteRef} id = "remoteAudio" 
-                  controls autoplay></audio> 
+                  controls autoPlay></audio> 
         </Button>
         
         <Button icon={speaking ? <AudioOutlined /> : <AudioMutedOutlined />} 
             onClick={handleLocalInput}
         >
             <audio ref={localRef} id = "localAudio" 
-               controls autoplay></audio>
+               controls autoPlay></audio>
         </Button>
         
         
     </div>
 }
 
-export default Audio
+export default AudioCall
